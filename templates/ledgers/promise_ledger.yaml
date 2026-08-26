@@ -1,0 +1,17 @@
+# Promise Ledger
+#
+# Every claim the book makes about itself (genre, tone, themes, motifs)
+# mapped to beats that deliver it. A promise with fewer than min_beats
+# delivering scenes fails the checker (rule PL-01) — the label is a contract.
+#
+# Sources: book.yaml genre/theme/motifs, back-cover pitch, chapter 1
+# implicit contracts. Keep claims concrete enough to test against text.
+
+promises: []
+# Example:
+#   - claim: mind-bending science fiction
+#     source: book.yaml genre
+#     min_beats: 2
+#     beats:
+#       - "a burst wall pours decades-gone memory into a citizen (ch10)"
+#       - "the Archive voices the dead — a cadence alive in the walls (ch7)"

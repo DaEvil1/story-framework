@@ -4,11 +4,11 @@ Usage:
     python init.py <project-name> [--genre <genre>] [--title "<title>"]
 
 Creates a new directory with the full scaffolding: src/, tests/, tools/,
-docs/, templates for all ledger and config files, and the verification
-stack. Ready to write chapter 1 immediately.
+docs/, templates for all ledger and config files, the verification stack,
+the reference calibration corpus, and the canonical run documentation.
+Ready to write chapter 1 immediately.
 """
 
-import argparse
 import shutil
 import sys
 from pathlib import Path
@@ -16,6 +16,7 @@ from pathlib import Path
 FRAMEWORK_ROOT = Path(__file__).resolve().parent
 TEMPLATES = FRAMEWORK_ROOT / "templates"
 TOOLS = FRAMEWORK_ROOT / "tools"
+DOCS = FRAMEWORK_ROOT / "docs"
 
 DIRS = [
     "src/01-world",
@@ -29,6 +30,8 @@ DIRS = [
     "tests/council",
     "tests/character_board",
     "tests/analysis",
+    "tests/reader_state",
+    "references",
     "docs",
     "output",
     "drafts",
@@ -87,6 +90,8 @@ thresholds:
 """,
     "plantpayoff_ledger.yaml": """# Plant/Payoff Ledger
 # Everything planted must pay off; everything paid off must be planted.
+# status: texture marks PROTECTED LOCALS — deliberately unconnected details,
+# exempt from orphan warnings, reviewed at zero-based audits.
 
 items: []
 """,
@@ -124,6 +129,69 @@ title_payoffs: []
 """,
 }
 
+# Template files copied verbatim into the project (template-relative -> project-relative)
+FILE_COPIES = [
+    # Quantitative gate config + spec
+    ("rules.yaml", "tests/automated/rules.yaml"),
+    ("prose_rules.md", "tests/automated/prose_rules.md"),
+    # Board protocols
+    ("redteam/personas.md", "tests/redteam/personas.md"),
+    ("redteam/persona_templates.md", "tests/redteam/persona_templates.md"),
+    ("redteam/EDITORIAL_BOARD.md", "tests/redteam/EDITORIAL_BOARD.md"),
+    ("editorial_session_template.md", "tests/redteam/editorial_session_template.md"),
+    ("council/README.md", "tests/council/README.md"),
+    ("council/member_templates.md", "tests/council/member_templates.md"),
+    ("character_board/README.md", "tests/character_board/README.md"),
+    ("character_board/role_templates.md", "tests/character_board/role_templates.md"),
+    ("character_board/session_template.md", "tests/character_board/session_template.md"),
+    ("integrator_triage_template.md", "docs/integrator_triage_template.md"),
+    ("zero_base_audit_template.md", "docs/zero_base_audit_template.md"),
+    # Tool-consumed ledgers + scoring infrastructure
+    ("ledgers/promise_ledger.yaml", "tests/analysis/promise_ledger.yaml"),
+    ("ledgers/pillars.yaml", "tests/analysis/pillars.yaml"),
+    ("ledgers/scores_current.yaml", "tests/analysis/scores_current.yaml"),
+    ("ledgers/scores_history.yaml", "tests/analysis/scores_history.yaml"),
+    ("ledgers/intentional_violations.yaml", "tests/intentional_violations.yaml"),
+    ("ledgers/reception_scores.yaml", "tests/reception_scores.yaml"),
+    # Reader-state protocol
+    ("reader_state_README.md", "tests/reader_state/README.md"),
+    # Tests index
+    ("tests_README.md", "tests/README.md"),
+    # Manual test checklists
+    ("manual/character_arcs.md", "tests/manual/character_arcs.md"),
+    ("manual/consistency.md", "tests/manual/consistency.md"),
+    ("manual/motif_usage.md", "tests/manual/motif_usage.md"),
+    ("manual/plot_completeness.md", "tests/manual/plot_completeness.md"),
+    ("manual/style.md", "tests/manual/style.md"),
+    ("manual/thematic_coherence.md", "tests/manual/thematic_coherence.md"),
+    ("manual/absent_character.md", "tests/manual/absent_character.md"),
+    ("manual/the_limit_ambiguity.md", "tests/manual/the_limit_ambiguity.md"),
+    # src skeletons
+    ("src/canon.md", "src/01-world/canon.md"),
+    ("src/character_template.md", "src/02-characters/template.md"),
+    # Project-local doc skeletons
+    ("docs/authorial_intent.md", "docs/authorial_intent.md"),
+    ("docs/craft_narrative.md", "docs/craft_narrative.md"),
+    ("docs/experiment_lessons.md", "docs/experiment_lessons.md"),
+    ("docs/decisions.log", "docs/decisions.log"),
+]
+
+# Canonical framework docs copied into projects (single source: framework docs/)
+DOC_COPIES = [
+    "AUTONOMOUS_RUN.md",
+    "getting_started.md",
+    "pipeline.md",
+    "metric_interactions.md",
+    "story_craft_criteria.md",
+    "style_guide.md",
+]
+
+
+def copy_file(src: Path, dst: Path) -> None:
+    if src.exists():
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+
 
 def main():
     if len(sys.argv) < 2:
@@ -150,47 +218,41 @@ def main():
     for d in DIRS:
         (root / d).mkdir(parents=True, exist_ok=True)
 
-    # Copy tools
+    # Tools
     tools_dst = root / "tools"
-    tools_dst.mkdir(exist_ok=True)
+    tools_dst.mkdir(parents=True, exist_ok=True)
     for f in TOOLS.glob("*.py"):
         shutil.copy2(f, tools_dst / f.name)
 
-    # Copy rules template
-    rules_src = TEMPLATES / "rules.yaml"
-    if rules_src.exists():
-        shutil.copy2(rules_src, root / "tests" / "automated" / "rules.yaml")
-
-    # Copy template directories (personas, protocols, board READMEs)
-    for tmpl_dir in ("redteam", "council", "character_board"):
-        src = TEMPLATES / tmpl_dir
-        dst = root / "tests" / tmpl_dir
+    # Template files
+    missing = []
+    for tmpl_rel, proj_rel in FILE_COPIES:
+        src = TEMPLATES / tmpl_rel
         if src.exists():
-            dst.mkdir(parents=True, exist_ok=True)
-            for f in src.glob("*"):
-                shutil.copy2(f, dst / f.name)
+            copy_file(src, root / proj_rel)
+        else:
+            missing.append(tmpl_rel)
 
-    # Copy canonical docs so agents working in-project have full context
-    docs_src = FRAMEWORK_ROOT / "docs"
-    docs_dst = root / "docs"
-    for fname in ("AUTONOMOUS_RUN.md", "getting_started.md", "metric_interactions.md"):
-        src = docs_src / fname
-        if src.exists():
-            shutil.copy2(src, docs_dst / fname)
+    # Reference calibration corpus
+    refs_src = TEMPLATES / "references"
+    if refs_src.exists():
+        for f in refs_src.glob("*"):
+            shutil.copy2(f, root / "references" / f.name)
 
-    # Write ledger schemas
+    # Canonical run docs
+    for fname in DOC_COPIES:
+        copy_file(DOCS / fname, root / "docs" / fname)
+
+    # Ledger schemas
     analysis = root / "tests" / "analysis"
     for fname, content in LEDGER_SCHEMES.items():
         (analysis / fname).write_text(content, encoding="utf-8")
 
-    # Story config
-    story_yaml = f'title: "{title}"\nstatus: drafting\n'
-    story_yaml += f'genre: "{genre}"\n'
-    story_yaml += "target_word_count: 10000\nmax_word_count: 50000\nchapters: []\n"
-    (root / "story.yaml").write_text(story_yaml, encoding="utf-8")
-
-    book_yaml = f'title: "{title}"\nstatus: drafting\ngenre: {genre}\n'
-    book_yaml += "target_word_count: 10000\nmax_word_count: 50000\nchapters: []\n"
+    # Story config — single source of truth (tools read book.yaml)
+    book_yaml = f'title: "{title}"\nstatus: drafting\n'
+    book_yaml += f'genre: {genre}\n'
+    book_yaml += "target_word_count: 10000\nmax_word_count: 50000\n"
+    book_yaml += "style: []\ntheme: []\nmotifs: []\nchapters: []\n"
     (root / "book.yaml").write_text(book_yaml, encoding="utf-8")
 
     # First chapter
@@ -198,25 +260,16 @@ def main():
         CHAPTER_TEMPLATE, encoding="utf-8")
 
     # Discovery buffer
-    buffer = root / "drafts" / "discovery_buffer.md"
-    buffer.write_text(
+    (root / "drafts" / "discovery_buffer.md").write_text(
         "# Discovery Buffer\n\n"
         "Things that appeared while writing and feel alive. Un-scored,\n"
         "no justification required.\n", encoding="utf-8")
 
-    # Canonical pipeline doc (full process definition, not a stub)
-    pipeline_src = docs_src / "pipeline.md"
-    if pipeline_src.exists():
-        shutil.copy2(pipeline_src, docs_dst / "pipeline.md")
-    else:
-        (docs_dst / "pipeline.md").write_text(
-            "# Pipeline\n\nSee story-framework repo for canonical documentation.\n",
-            encoding="utf-8")
     (root / "README.md").write_text(f"# {title}\n\nA {genre} story.\n", encoding="utf-8")
 
     # .gitignore
     (root / ".gitignore").write_text(
-        "__pycache__/\n.experiments/\n*.pyc\noutput/\n", encoding="utf-8")
+        "__pycache__/\n*.pyc\n.experiments/\noutput/\n", encoding="utf-8")
 
     # Init git
     import subprocess
@@ -226,15 +279,16 @@ def main():
                    cwd=root, capture_output=True)
 
     print(f"\nInitialized '{name}' ({genre})")
-    print(f"  {len(DIRS)} directories created")
-    print(f"  Tools copied from framework")
-    print(f"  Git initialized with initial commit")
+    print(f"  {len(DIRS)} directories, {len(FILE_COPIES)} template files")
+    print(f"  Tool stack, boards, ledgers, rubric, reference corpus ready")
+    if missing:
+        print(f"  WARNING: missing framework templates: {', '.join(missing)}")
     print(f"\nNext steps:")
-    print(f"  1. Fill in book.yaml / story.yaml with your premise")
-    print(f"  2. Write src/04-chapters/chapter_01.md")
+    print(f"  1. Fill in book.yaml (genre/theme/motifs) + docs/authorial_intent.md")
+    print(f"  2. Write src/04-chapters/chapter_01.md; follow docs/AUTONOMOUS_RUN.md")
     print(f"  3. python tools/check_story.py")
-    print(f"  4. Define your red-team personas in tests/redteam/")
-    print(f"  5. Define your council members in tests/council/")
+    print(f"  4. Adapt personas in tests/redteam/personas.md (use persona_templates.md)")
+    print(f"  5. Define council members in tests/council/ BEFORE first verdicts")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,13 @@
+# Score history snapshots. Append one block per re-score; never edit old
+# entries. Each entry: revision label -> {date, note, scores}.
+# Only scores actually recorded at that revision are present; the pillar
+# report compares over the intersection of members.
+
+history: {}
+# Example:
+#   r1_initial:
+#     date: 2026-08-21
+#     note: "first full assessment"
+#     scores:
+#       1: 7
+#       2: 5

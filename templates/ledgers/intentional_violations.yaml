@@ -1,0 +1,32 @@
+# Intentional Violation Registry
+#
+# A rule may be violated when there is a positive case: state why this
+# construction normally fails, why it succeeds HERE, and confirm that
+# obeying the rule would produce a weaker sentence.
+#
+# This distinguishes:
+#   regression constraint — "don't ACCIDENTALLY do this"
+#   style law             — "never do this"
+# The framework has the former. It does not have the latter.
+#
+# Matching: a checker finding is suppressed as *intentional* when its rule id
+# and file match an entry AND the finding's text/context contains `pattern`
+# (case-insensitive).
+#
+# Rules:
+# - Warning-level rules may be overridden freely.
+# - ERROR-level rules (e.g., ST-01) additionally REQUIRE a `logged:` field
+#   referencing a docs/decisions.log entry — structural rules protect other
+#   systems and need the heavier signature.
+# - Entries are reviewed at every zero-based audit; stale justifications die.
+
+violations: []
+# Example:
+#   - id: IV-001
+#     rule: NC-01
+#     file: chapter_11.md
+#     pattern: "she did not say why"
+#     justification: >
+#       The double negation enacts the scene's whole mechanism. Rewriting to
+#       affirmative phrasing explains the restraint and kills it.
+#     added: 2026-08-25

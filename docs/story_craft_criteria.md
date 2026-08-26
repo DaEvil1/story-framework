@@ -90,8 +90,8 @@ Each criterion is written as a testable feature. Scoring anchors:
     the truth was visible. Reveals recontextualize rather than contradict.
 19. **Ambiguity as design, not evasion** — Productive ambiguity leaves the
     reader weighing two rich interpretations; thin ambiguity withholds so
-    much that neither interpretation has substance. (The Limit-as-person vs.
-    Limit-as-system needs evidence for both.)
+    much that neither interpretation has substance. (Every deliberate
+    ambiguity needs live evidence for BOTH readings.)
 20. **Reveal timing** — Information arrives at the latest moment that still
     allows consequence to play out; early reveals must change behavior.
 

@@ -1,0 +1,18 @@
+# Current criterion scores (machine-readable mirror of your assessment doc)
+# Update in the same session as any re-score. Criteria ids match
+# docs/story_craft_criteria.md (1–50).
+
+meta:
+  revision: 0
+  date: ""
+  overall_raw: 0
+
+qualitative:
+  redteam_panel_score: null   # mean of holistic persona scores, tests/reception_scores.yaml
+  council_score: null         # Council of Readers mean, tests/reception_scores.yaml
+  note: qualitative signals are tracked separately from the rubric dashboard
+
+scores: {}
+# One line per scored criterion, e.g.:
+#   1: 7
+#   2: 5

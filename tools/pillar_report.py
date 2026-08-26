@@ -35,6 +35,11 @@ def main() -> int:
     scores = {int(k): v for k, v in current["scores"].items()}
     penalty_factor = float(pillars_doc.get("penalty_factor", 0.25))
 
+    if not scores:
+        print("No criterion scores recorded yet in scores_current.yaml.")
+        print("Score the rubric first (docs/story_craft_criteria.md), then re-run.")
+        return 0
+
     out = [
         "# Pillar Report (generated)",
         "",

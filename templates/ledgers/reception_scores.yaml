@@ -1,0 +1,25 @@
+# Reception Scores (append-only)
+# SENSOR LANGUAGE: these are calibrated instrument readings from simulated
+# readers (one underlying model, correlated blind spots). They track MOVEMENT
+# and DIVERGENCE over time. They are not evidence about real human readers.
+#
+# Two qualitative signals, both 1-10 means:
+#   redteam_panel_score — mean of holistic personas' "how good was it to read"
+#   council_score       - mean of Council of Readers session scores
+# Rubric raw/adjusted live in tests/analysis/scores_current.yaml + history.
+
+sessions: []
+# Example:
+#   - date: 2026-08-25
+#     revision: r3 text
+#     redteam_panel:
+#       P1_craft: 7.3
+#       P2_genre: 7.3
+#       score: 7.6
+#     council:
+#       C1_craft_reader: 8
+#       C2_idea_reader: 7
+#       score: 8.0
+#     notes: >
+#       Council > panel by 0.4: target audiences rate reach higher than
+#       adversarial critics rate defect-freedom.

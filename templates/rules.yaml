@@ -1,28 +1,127 @@
-# Starter Rules — generic AI-pattern detection
+# Automated prose & structure rules
 #
-# These rules catch common LLM prose tics. They are STARTING POINTS:
-# tune thresholds per project, add project-specific patterns via the
-# regression protocol, and remove anything that fights your story's voice.
+# Data consumed by tools/check_story.py. Each rule found in a chapter is
+# reported with file, line number, rule id, and matched text.
+#
+# Regression protocol: when a violation is found during editing or review,
+# add its pattern here so it cannot silently reappear. Log substantive rule
+# changes in docs/decisions.log.
+#
+# The PR/END/ST rules below are battle-tested anti-authorial-commentary
+# defaults. Frequency caps are STORY-SPECIFIC — add your own once you know
+# which words/phrases your story overuses (the analyzer's high-frequency
+# report tells you; tune thresholds only with a count in hand).
 
 version: 1
+spec: tests/automated/prose_rules.md
 
-phrase_rules: []
-regex_rules: []
+# Exact phrases (case-insensitive substring match).
+phrase_rules:
+  - id: PR-01
+    name: authorial-learning
+    severity: error
+    description: Narrator states what a character learned or came to understand.
+    phrases:
+      - had learned
+      - learned that
+      - came to see
+      - came to understand
+      - came to realize
+      - came to know
 
-frequency_rules:
-  - id: FQ-OPENER
-    name: opener-dominance
+  - id: PR-02
+    name: realized-that
+    severity: error
+    description: Narrator explains a character's realization instead of showing it.
+    phrases:
+      - realized that
+
+  - id: PR-03
+    name: carried-summary
+    severity: error
+    description: 'Summary of internal state via "what she carried" constructions.'
+    phrases:
+      - what she carried
+      - what he carried
+      - what they carried
+
+  - id: PR-04
+    name: without-motivation
+    severity: error
+    description: Authorial explanation of why an action was taken.
+    phrases:
+      - without comment
+      - without justification
+      - without hesitation
+      - without doubt
+      - without explanation
+
+  - id: PR-05
+    name: moral-summary
+    severity: error
+    description: Known moral-of-the-story summary lines. Replace with your own discoveries.
+    phrases: []
+
+  - id: PR-07
+    name: felt-understanding
+    severity: error
+    description: Narrator explaining a character's dim understanding of theme.
+    phrases:
+      - more than she understood
+      - more than he understood
+
+  - id: PR-08
+    name: had-the-feeling
+    severity: error
+    description: Authorial thematic conclusion delivered through the narrator.
+    phrases:
+      - she had the feeling now that
+      - he had the feeling now that
+
+# Regular-expression rules (case-insensitive). scope: line | ending
+regex_rules:
+  - id: PR-06
+    name: felt-emotion-label
+    severity: error
+    scope: line
+    description: Narrator labeling an emotional state instead of showing it.
+    pattern: '\b(felt|feels|grew)\s+(uncertain|afraid|scared|guilty|ashamed|anxious|conflicted|torn|hopeful|relieved|lonely|betrayed|angry|sad|happy|proud)\b'
+
+  - id: END-01
+    name: ending-significance
     severity: warning
-    phrase: "The"
-    max_per_chapter: 999  # tracked by analyzer, not hard-capped
-    # Flag if any single sentence-opener exceeds 15% of sentences
-    # (canon reference: rarely exceeds ~10%)
+    scope: ending
+    ending_chars: 500
+    description: Chapter ending reflects on meaning/significance instead of landing on sensory immediacy.
+    pattern: '\b(meaning|significance|the moral|the lesson)\b'
 
+# Whole-corpus structural checks (implemented in tools/check_story.py).
 structural_rules:
   - id: ST-01
     name: duplicate-chapter-title
     severity: error
     description: Two chapter files share the same heading title.
 
+# Repeated-phrase caps. Add YOUR story's anchors and refrains here —
+# deliberate devices get a per-chapter cap (catches drift into tic),
+# accidental tics get a total cap. Examples of the shape:
+#
+# frequency_rules:
+#   - id: FQ-01
+#     name: my-anchor-device
+#     severity: warning
+#     phrase: in her pocket
+#     max_per_chapter: 2
+#     max_total: 14
+#
+#   - id: FQ-07
+#     name: as-if-simile
+#     severity: warning
+#     phrase: as if
+#     max_total: 10
+
+frequency_rules: []
+
 settings:
+  # Straighten curly quotes before matching so apostrophe style never hides a hit.
   normalize_quotes: true
