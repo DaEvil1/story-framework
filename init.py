@@ -167,9 +167,14 @@ def main():
         (analysis / fname).write_text(content, encoding="utf-8")
 
     # Story config
-    story_yaml = f'title: "{title}"\ngenre: "{genre}"\nstatus: drafting\n'
+    story_yaml = f'title: "{title}"\nstatus: drafting\n'
+    story_yaml += f'genre: "{genre}"\n'
     story_yaml += "target_word_count: 10000\nmax_word_count: 50000\nchapters: []\n"
     (root / "story.yaml").write_text(story_yaml, encoding="utf-8")
+
+    book_yaml = f'title: "{title}"\nstatus: drafting\ngenre: {genre}\n'
+    book_yaml += "target_word_count: 10000\nmax_word_count: 50000\nchapters: []\n"
+    (root / "book.yaml").write_text(book_yaml, encoding="utf-8")
 
     # First chapter
     (root / "src" / "04-chapters" / "chapter_01.md").write_text(
