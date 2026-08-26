@@ -1,0 +1,28 @@
+# Starter Rules — generic AI-pattern detection
+#
+# These rules catch common LLM prose tics. They are STARTING POINTS:
+# tune thresholds per project, add project-specific patterns via the
+# regression protocol, and remove anything that fights your story's voice.
+
+version: 1
+
+phrase_rules: []
+regex_rules: []
+
+frequency_rules:
+  - id: FQ-OPENER
+    name: opener-dominance
+    severity: warning
+    phrase: "The"
+    max_per_chapter: 999  # tracked by analyzer, not hard-capped
+    # Flag if any single sentence-opener exceeds 15% of sentences
+    # (canon reference: rarely exceeds ~10%)
+
+structural_rules:
+  - id: ST-01
+    name: duplicate-chapter-title
+    severity: error
+    description: Two chapter files share the same heading title.
+
+settings:
+  normalize_quotes: true
