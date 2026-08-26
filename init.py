@@ -205,9 +205,13 @@ def main():
     title = "Untitled"
     for i, arg in enumerate(sys.argv):
         if arg == "--genre" and i + 1 < len(sys.argv):
-            genre = sys.argv[i + 1]
+            val = sys.argv[i + 1]
+            if val and not val.startswith("--"):
+                genre = val
         if arg == "--title" and i + 1 < len(sys.argv):
-            title = sys.argv[i + 1]
+            val = sys.argv[i + 1]
+            if val and not val.startswith("--"):
+                title = val
 
     root = Path(name)
     if root.exists():
