@@ -161,6 +161,23 @@ def main():
     if rules_src.exists():
         shutil.copy2(rules_src, root / "tests" / "automated" / "rules.yaml")
 
+    # Copy template directories (personas, protocols, board READMEs)
+    for tmpl_dir in ("redteam", "council", "character_board"):
+        src = TEMPLATES / tmpl_dir
+        dst = root / "tests" / tmpl_dir
+        if src.exists():
+            dst.mkdir(parents=True, exist_ok=True)
+            for f in src.glob("*"):
+                shutil.copy2(f, dst / f.name)
+
+    # Copy canonical docs so agents working in-project have full context
+    docs_src = FRAMEWORK_ROOT / "docs"
+    docs_dst = root / "docs"
+    for fname in ("AUTONOMOUS_RUN.md", "getting_started.md", "metric_interactions.md"):
+        src = docs_src / fname
+        if src.exists():
+            shutil.copy2(src, docs_dst / fname)
+
     # Write ledger schemas
     analysis = root / "tests" / "analysis"
     for fname, content in LEDGER_SCHEMES.items():
@@ -187,11 +204,14 @@ def main():
         "Things that appeared while writing and feel alive. Un-scored,\n"
         "no justification required.\n", encoding="utf-8")
 
-    # Empty docs
-    (root / "docs" / "pipeline.md").write_text(
-        "# Pipeline\n\nSee the story-framework repo for the canonical pipeline\n"
-        "documentation. This file will be customized per project.\n",
-        encoding="utf-8")
+    # Canonical pipeline doc (full process definition, not a stub)
+    pipeline_src = docs_src / "pipeline.md"
+    if pipeline_src.exists():
+        shutil.copy2(pipeline_src, docs_dst / "pipeline.md")
+    else:
+        (docs_dst / "pipeline.md").write_text(
+            "# Pipeline\n\nSee story-framework repo for canonical documentation.\n",
+            encoding="utf-8")
     (root / "README.md").write_text(f"# {title}\n\nA {genre} story.\n", encoding="utf-8")
 
     # .gitignore
