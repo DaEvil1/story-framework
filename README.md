@@ -1,6 +1,8 @@
 # Story Framework
 
 A generalizable creative search system for AI-driven fiction writing.
+Genre-agnostic: literary fiction, fantasy, SF, thriller, romance,
+modern drama, or any combination.
 
 ## What this provides
 

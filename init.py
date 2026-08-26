@@ -3,6 +3,8 @@
 Usage:
     python init.py <project-name> [--genre <genre>] [--title "<title>"]
 
+ genre is free-text: fantasy, romance, thriller, literary-sf, modern-drama, etc.
+
 Creates a new directory with the full scaffolding: src/, tests/, tools/,
 docs/, templates for all ledger and config files, the verification stack,
 the reference calibration corpus, and the canonical run documentation.
@@ -199,7 +201,7 @@ def main():
         sys.exit(1)
 
     name = sys.argv[1]
-    genre = "literary-sf"
+    genre = ""
     title = "Untitled"
     for i, arg in enumerate(sys.argv):
         if arg == "--genre" and i + 1 < len(sys.argv):
