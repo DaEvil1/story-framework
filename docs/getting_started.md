@@ -7,9 +7,15 @@
 ## Starting a new story
 
 ```bash
-python init.py my-story --genre literary-sf --title "My Novel"
-cd my-story
+python init.py stories/my-story --genre literary-sf --title "My Novel"
+cd stories/my-story
 ```
+
+Each story is a self-contained git repo (the experiment lifecycle needs real
+worktrees). The framework repo ignores `stories/`, so completed stories stay
+local — give a story its own remote if you want it backed up. Starting the
+next story is just another `init.py` run with a new name; nothing is shared
+between runs except the framework itself.
 
 The scaffold includes everything: tool stack, board protocols and persona
 templates, all ledgers, the 50-criterion rubric (`docs/story_craft_criteria.md`),
